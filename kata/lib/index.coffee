@@ -6,7 +6,7 @@ socket = null
 
 createSender = (host, port) ->
 	(message) ->
-		console.log "Sending #{message} to #{host}"
+		console.log "Sending #{message} to #{host}:#{port}"
 		buffer = new Buffer(message)
 		socket.send buffer, 0, buffer.length, port, host
 
@@ -21,7 +21,7 @@ removeTrialFor = (host) ->
 
 handleMessage = (messageBuffer, rinfo) =>
 	message = messageBuffer.toString()
-	console.log "Received #{message} from #{rinfo.address}"
+	console.log "Received #{message} from #{rinfo.address}:#{rinfo.port}"
 	if message == 'START'
 		currentTrial = createTrialFor rinfo.address, rinfo.port
 		currentTrial.start()
