@@ -1,23 +1,38 @@
 dgram = require 'dgram'
+socketIo = require 'socket.io'
 
 miaGame = require './miaGame'
 remotePlayer = require './remotePlayer'
 
 class Server
 	log = ->
-	constructor: (@game, port) ->
-		handleRawMessage = (message, rinfo) =>
+	constructor: (@game, port, callback) ->
+		handleUdpMessage = (message, rinfo) =>
 			fromHost = rinfo.address
 			fromPort = rinfo.port
-			log "received '#{message}' from #{fromHost}:#{fromPort}"
+			connection = new UdpConnection(fromHost, fromPort, @udpSocket)
+			handleRawMessage(message, connection)
+
+		handleWebSocketMessage = (message, socket) =>
+			connection = new WebSocketConnection(socket)
+			handleRawMessage(message, connection)
+
+		handleRawMessage = (message, connection) =>
+			log "received '#{message}' from #{connection}"
 			messageParts = message.toString().split ';'
 			command = messageParts[0]
 			args = messageParts[1..]
-			@handleMessage command, args, new UdpConnection(fromHost, fromPort, @udpSocket)
+			@handleMessage command, args, connection
 
 		@players = {}
-		@udpSocket = dgram.createSocket 'udp4', handleRawMessage
+		@udpSocket = dgram.createSocket 'udp4', handleUdpMessage
 		@udpSocket.bind port
+
+		@webSocket = socketIo.listen port + 1, callback
+		@webSocket.set 'client store expiration', .2
+		@webSocket.sockets.on 'connection', (socket) ->
+			socket.on 'message', (message) ->
+				handleWebSocketMessage(message, socket)
 
 	enableLogging: -> log = console.log
 
@@ -32,7 +47,7 @@ class Server
 		else
 			player = @playerFor connection
 			player?.handleMessage messageCommand, messageArgs
-	
+
 	handleRegistration: (name, connection, isSpectator) ->
 		newPlayer = @createPlayer name, connection
 		unless @isValidName name
@@ -54,8 +69,9 @@ class Server
 			return player if player.name == name
 		null
 
-	shutDown: ->
+	shutDown: (callback) ->
 		@udpSocket.close()
+		@webSocket.server.close(callback)
 
 	playerFor: (connection) ->
 		@players[connection.id]
@@ -74,21 +90,28 @@ class Server
 	class UdpConnection
 		constructor: (@host, @port, @socket) ->
 			@id = "#{@host}:#{@port}"
-	
+
+		toString: -> @id
+
 		belongsTo: (player) ->
 			player.remoteHost == @host
-	
+
 		createPlayer: (name) ->
 			sendMessageCallback = (message) =>
 				log "sending '#{message}' to #{name} (#{@id})"
 				buffer = new Buffer(message)
 				@socket.send buffer, 0, buffer.length, @port, @host
 			player = remotePlayer.create name, sendMessageCallback
-			
+
 			player.remoteHost = @host
 			player
-	
+
+	class WebSocketConnection
+		constructor: (@socket) ->
+			@id = @socket.id
+
+		toString: -> @id
 
 
-exports.start = (game, port) ->
-	return new Server game, port
+exports.start = (game, port, callback) ->
+	return new Server game, port, callback
