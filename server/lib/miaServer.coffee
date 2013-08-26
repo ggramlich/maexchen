@@ -12,7 +12,7 @@ class Server
 			handleRawMessage(message, connection)
 
 		handleWebSocketMessage = (message, socket) =>
-			connection = new WebSocketConnection(socket)
+			connection = new WebSocketConnection(socket.handshake.address, socket)
 			handleRawMessage(message, connection)
 
 		handleRawMessage = (message, connection) =>
@@ -86,11 +86,13 @@ class Server
 	createPlayer: (name, connection) ->
 		connection.createPlayer name
 		
-	class UdpConnection
+	class Connection
 		constructor: (rinfo, @socket) ->
 			@host = rinfo.address
 			@port = rinfo.port
 			@id = "#{@host}:#{@port}"
+
+	class UdpConnection extends Connection
 
 		toString: => @id
 
@@ -107,11 +109,7 @@ class Server
 			player.remoteHost = @host
 			player
 
-	class WebSocketConnection
-		constructor: (@socket) ->
-			@host = @socket.handshake.address.address
-			@port = @socket.handshake.address.port
-			@id = "#{@host}:#{@port}"
+	class WebSocketConnection extends Connection
 
 		toString: => @id
 
