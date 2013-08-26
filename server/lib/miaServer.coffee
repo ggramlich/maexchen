@@ -7,14 +7,6 @@ remotePlayer = require './remotePlayer'
 class Server
 	log = ->
 	constructor: (@game, port, callback) ->
-		handleUdpMessage = (message, rinfo) =>
-			connection = new UdpConnection(rinfo, @udpSocket)
-			handleRawMessage(message, connection)
-
-		handleWebSocketMessage = (message, socket) =>
-			connection = new WebSocketConnection(socket.handshake.address, socket)
-			handleRawMessage(message, connection)
-
 		handleRawMessage = (message, connection) =>
 			log "received '#{message}' from #{connection}"
 			messageParts = message.toString().split ';'
@@ -23,7 +15,8 @@ class Server
 			@handleMessage command, args, connection
 
 		@players = {}
-		@udpSocket = dgram.createSocket 'udp4', handleUdpMessage
+		@udpSocket = dgram.createSocket 'udp4', (message, address) =>
+			handleRawMessage message, new UdpConnection address, @udpSocket
 		@udpSocket.bind port
 
 		@webSocket = socketIo.listen port, callback
@@ -31,7 +24,7 @@ class Server
 		@webSocket.set 'log level', 0
 		@webSocket.sockets.on 'connection', (socket) ->
 			socket.on 'message', (message) ->
-				handleWebSocketMessage(message, socket)
+				handleRawMessage message, new WebSocketConnection socket.handshake.address, socket
 
 	enableLogging: -> log = console.log
 
@@ -86,9 +79,9 @@ class Server
 		connection.createPlayer name
 
 	class Connection
-		constructor: (rinfo, @socket) ->
-			@host = rinfo.address
-			@port = rinfo.port
+		constructor: (address, @socket) ->
+			@host = address.address
+			@port = address.port
 			@id = "#{@host}:#{@port}"
 
 		toString: => @id
