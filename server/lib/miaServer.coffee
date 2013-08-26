@@ -6,6 +6,7 @@ remotePlayer = require './remotePlayer'
 
 class Server
 	log = ->
+
 	constructor: (@game, port, callback) ->
 		handleRawMessage = (message, connection) =>
 			log "received '#{message}' from #{connection}"
@@ -14,17 +15,22 @@ class Server
 			args = messageParts[1..]
 			@handleMessage command, args, connection
 
-		@players = {}
-		@udpSocket = dgram.createSocket 'udp4', (message, address) =>
-			handleRawMessage message, new UdpConnection address, @udpSocket
-		@udpSocket.bind port
+		initUdpSocket = (port) =>
+			@udpSocket = dgram.createSocket 'udp4', (message, address) =>
+				handleRawMessage message, new UdpConnection address, @udpSocket
+			@udpSocket.bind port
 
-		@webSocket = socketIo.listen port, callback
-		@webSocket.set 'client store expiration', .2
-		@webSocket.set 'log level', 0
-		@webSocket.sockets.on 'connection', (socket) ->
-			socket.on 'message', (message) ->
-				handleRawMessage message, new WebSocketConnection socket.handshake.address, socket
+		initWebSocket = (port) =>
+			@webSocket = socketIo.listen port, callback
+			@webSocket.set 'client store expiration', .2
+			@webSocket.set 'log level', 0
+			@webSocket.sockets.on 'connection', (socket) ->
+				socket.on 'message', (message) ->
+					handleRawMessage message, new WebSocketConnection socket.handshake.address, socket
+
+		initUdpSocket port
+		initWebSocket port
+		@players = {}
 
 	enableLogging: -> log = console.log
 
