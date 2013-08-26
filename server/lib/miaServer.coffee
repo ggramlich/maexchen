@@ -35,25 +35,29 @@ class Server
 	enableLogging: -> log = console.log
 
 	handleMessage: (messageCommand, messageArgs, connection) ->
+		addPlayer = (player) =>
+			@players[connection.id] = player
+			if messageCommand == 'REGISTER_SPECTATOR'
+				@game.registerSpectator player
+			else
+				@game.registerPlayer player
+			player.registered()
+
+		handleRegistration = (name) =>
+			newPlayer = @createPlayer name, connection
+			unless @isValidName name
+				newPlayer.registrationRejected 'INVALID_NAME'
+			else if @nameIsTakenByAnotherPlayer name, connection
+				newPlayer.registrationRejected 'NAME_ALREADY_TAKEN'
+			else
+				addPlayer newPlayer
+
 		log "handleMessage '#{messageCommand}' '#{messageArgs}' from #{connection.id}"
-		if messageCommand == 'REGISTER'
-			name = messageArgs[0]
-			@handleRegistration name, connection, false
-		else if messageCommand == 'REGISTER_SPECTATOR'
-			name = messageArgs[0]
-			@handleRegistration name, connection, true
+		if messageCommand == 'REGISTER' or messageCommand == 'REGISTER_SPECTATOR'
+			handleRegistration messageArgs[0]
 		else
 			player = @playerFor connection
 			player?.handleMessage messageCommand, messageArgs
-
-	handleRegistration: (name, connection, isSpectator) ->
-		newPlayer = @createPlayer name, connection
-		unless @isValidName name
-			newPlayer.registrationRejected 'INVALID_NAME'
-		else if @nameIsTakenByAnotherPlayer name, connection
-			newPlayer.registrationRejected 'NAME_ALREADY_TAKEN'
-		else
-			@addPlayer connection, newPlayer, isSpectator
 
 	isValidName: (name) ->
 		name != '' and name.length <= 20 and not /[,;:\s]/.test name
@@ -73,14 +77,6 @@ class Server
 	playerFor: (connection) ->
 		@players[connection.id]
 	
-	addPlayer: (connection, player, isSpectator) ->
-		@players[connection.id] = player
-		if isSpectator
-			@game.registerSpectator player
-		else
-			@game.registerPlayer player
-		player.registered()
-
 	createPlayer: (name, connection) ->
 		connection.createPlayer name
 
