@@ -61,12 +61,11 @@ class Server
 
 	nameIsTakenByAnotherPlayer: (name, connection) ->
 		existingPlayer = @findPlayerByName(name)
-		existingPlayer and not connection.belongsTo existingPlayer
+		existingPlayer? and not connection.belongsTo existingPlayer
 
 	findPlayerByName: (name) ->
 		for key, player of @players
 			return player if player.name == name
-		null
 
 	shutDown: (callback) ->
 		@udpSocket.close()
