@@ -85,7 +85,7 @@ class Server
 
 	createPlayer: (name, connection) ->
 		connection.createPlayer name
-		
+
 	class Connection
 		constructor: (rinfo, @socket) ->
 			@host = rinfo.address
@@ -94,28 +94,23 @@ class Server
 
 		toString: => @id
 
-		belongsTo: (player) ->
+		belongsTo: (player) =>
 			player.remoteHost == @host
 
-	class UdpConnection extends Connection
-		createPlayer: (name) ->
-			sendMessageCallback = (message) =>
+		createPlayer: (name) =>
+			player = remotePlayer.create name, (message) =>
 				log "sending '#{message}' to #{name} (#{@id})"
-				buffer = new Buffer(message)
-				@socket.send buffer, 0, buffer.length, @port, @host
-			player = remotePlayer.create name, sendMessageCallback
+				@send message
+				player.remoteHost = @host
 
-			player.remoteHost = @host
-			player
+	class UdpConnection extends Connection
+		send: (message) =>
+			buffer = new Buffer(message)
+			@socket.send buffer, 0, buffer.length, @port, @host
 
 	class WebSocketConnection extends Connection
-		createPlayer: (name) ->
-			sendMessageCallback = (message) =>
-				log "sending '#{message}' to #{name} (#{@id})"
-				@socket.send message
-			player = remotePlayer.create name, sendMessageCallback
-			player.remoteHost = @host
-			player
+		send: (message) =>
+			@socket.send message
 
 exports.start = (game, port, callback) ->
 	return new Server game, port, callback
