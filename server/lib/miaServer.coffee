@@ -10,14 +10,14 @@ class Server
 	constructor: (@game, port, callback) ->
 		handleRawMessage = (message, connection) =>
 			log "received '#{message}' from #{connection}"
-			messageParts = message.toString().split ';'
+			messageParts = message.split ';'
 			command = messageParts[0]
 			args = messageParts[1..]
 			@handleMessage command, args, connection
 
 		initUdpSocket = (port) =>
 			@udpSocket = dgram.createSocket 'udp4', (message, address) =>
-				handleRawMessage message, new UdpConnection address, @udpSocket
+				handleRawMessage message.toString(), new UdpConnection address, @udpSocket
 			@udpSocket.bind port
 
 		initWebSocket = (port) =>
