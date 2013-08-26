@@ -92,13 +92,12 @@ class Server
 			@port = rinfo.port
 			@id = "#{@host}:#{@port}"
 
-	class UdpConnection extends Connection
-
 		toString: => @id
 
 		belongsTo: (player) ->
 			player.remoteHost == @host
 
+	class UdpConnection extends Connection
 		createPlayer: (name) ->
 			sendMessageCallback = (message) =>
 				log "sending '#{message}' to #{name} (#{@id})"
@@ -110,12 +109,6 @@ class Server
 			player
 
 	class WebSocketConnection extends Connection
-
-		toString: => @id
-
-		belongsTo: (player) ->
-			player.remoteHost == @host
-
 		createPlayer: (name) ->
 			sendMessageCallback = (message) =>
 				log "sending '#{message}' to #{name} (#{@id})"
