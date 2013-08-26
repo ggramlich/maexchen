@@ -92,7 +92,7 @@ class Server
 		constructor: (@host, @port, @socket) ->
 			@id = "#{@host}:#{@port}"
 
-		toString: -> @id
+		toString: => @id
 
 		belongsTo: (player) ->
 			player.remoteHost == @host
@@ -111,8 +111,13 @@ class Server
 		constructor: (@socket) ->
 			@id = @socket.id
 
-		toString: -> @id
+		toString: => @id
 
+		createPlayer: (name) ->
+			sendMessageCallback = (message) =>
+				log "sending '#{message}' to #{name} (#{@id})"
+				@socket.send message
+			remotePlayer.create name, sendMessageCallback
 
 exports.start = (game, port, callback) ->
 	return new Server game, port, callback
