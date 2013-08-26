@@ -8,9 +8,7 @@ class Server
 	log = ->
 	constructor: (@game, port, callback) ->
 		handleUdpMessage = (message, rinfo) =>
-			fromHost = rinfo.address
-			fromPort = rinfo.port
-			connection = new UdpConnection(fromHost, fromPort, @udpSocket)
+			connection = new UdpConnection(rinfo, @udpSocket)
 			handleRawMessage(message, connection)
 
 		handleWebSocketMessage = (message, socket) =>
@@ -89,7 +87,9 @@ class Server
 		connection.createPlayer name
 		
 	class UdpConnection
-		constructor: (@host, @port, @socket) ->
+		constructor: (rinfo, @socket) ->
+			@host = rinfo.address
+			@port = rinfo.port
 			@id = "#{@host}:#{@port}"
 
 		toString: => @id
