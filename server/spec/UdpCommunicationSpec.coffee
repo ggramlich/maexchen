@@ -7,7 +7,7 @@ describe 'udp communication', ->
 		game = registerPlayer: (@registeredPlayer) =>
 		@server = miaServer.start game, serverPort
 		@receiveMessageOnClient = ->
-		@socket = dgram.createSocket 'udp4', (message, rinfo) => @receiveMessageOnClient(message, rinfo)
+		@socket = dgram.createSocket 'udp4', (message) => @receiveMessageOnClient message
 		@sendMessage = (message) =>
 			buffer = new Buffer(message)
 			@socket.send buffer, 0, buffer.length, serverPort, 'localhost'
@@ -38,6 +38,25 @@ describe 'udp communication', ->
 		@receiveMessageOnClient = (message) -> messageReceived = message.toString()
 		@socket.bind()
 		@sendMessage 'REGISTER;client-name'
+		waitsFor =>
+			messageReceived?
+		runs =>
+			expect(messageReceived).toEqual 'REGISTERED'
+
+	it 'allows a client to reconnect from the same IP address', ->
+		messageReceived = null
+		@receiveMessageOnClient = (message) -> messageReceived = message.toString()
+		@socket.bind()
+		@sendMessage 'REGISTER;client-name'
+		waitsFor =>
+			messageReceived?
+		runs =>
+			@socket.close()
+
+			messageReceived = null
+			@socket = dgram.createSocket 'udp4', (message) => @receiveMessageOnClient message
+			@socket.bind()
+			@sendMessage 'REGISTER;client-name'
 		waitsFor =>
 			messageReceived?
 		runs =>
