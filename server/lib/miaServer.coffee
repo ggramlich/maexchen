@@ -28,8 +28,9 @@ class Server
 		@udpSocket = dgram.createSocket 'udp4', handleUdpMessage
 		@udpSocket.bind port
 
-		@webSocket = socketIo.listen port + 1, callback
+		@webSocket = socketIo.listen port, callback
 		@webSocket.set 'client store expiration', .2
+		@webSocket.set 'log level', 0
 		@webSocket.sockets.on 'connection', (socket) ->
 			socket.on 'message', (message) ->
 				handleWebSocketMessage(message, socket)

@@ -1,8 +1,7 @@
 miaServer = require '../lib/miaServer'
 io = require('socket.io-client')
 serverPort = 9000
-ioPort = serverPort + 1
-socketURL = "http://localhost:#{ioPort}"
+socketURL = "http://localhost:#{serverPort}"
 
 describe 'socket.io communication', ->
 	beforeEach (done) ->
