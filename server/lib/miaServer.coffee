@@ -109,15 +109,22 @@ class Server
 
 	class WebSocketConnection
 		constructor: (@socket) ->
-			@id = @socket.id
+			@host = @socket.handshake.address.address
+			@port = @socket.handshake.address.port
+			@id = "#{@host}:#{@port}"
 
 		toString: => @id
+
+		belongsTo: (player) ->
+			player.remoteHost == @host
 
 		createPlayer: (name) ->
 			sendMessageCallback = (message) =>
 				log "sending '#{message}' to #{name} (#{@id})"
 				@socket.send message
-			remotePlayer.create name, sendMessageCallback
+			player = remotePlayer.create name, sendMessageCallback
+			player.remoteHost = @host
+			player
 
 exports.start = (game, port, callback) ->
 	return new Server game, port, callback

@@ -3,17 +3,20 @@ io = require('socket.io-client')
 serverPort = 9000
 socketURL = "http://localhost:#{serverPort}"
 
+createClient = (onconnect) ->
+	client = io.connect socketURL,
+		'reconnect': false
+		'force new connection': true
+	client.on 'connect', onconnect
+	client
+
 describe 'socket.io communication', ->
 	beforeEach (done) ->
 		game = registerPlayer: (@registeredPlayer) =>
 		@receiveMessageOnClient = ->
 		@server = miaServer.start game, serverPort, =>
-			@client = io.connect socketURL,
-				'reconnect': false
-				'force new connection': true
-			@client.on 'connect', =>
-				@client.on 'message', (message) =>
-					@receiveMessageOnClient(message)
+			@client = createClient =>
+				@client.on 'message', (message) => @receiveMessageOnClient message
 				done()
 
 	afterEach (done) ->
@@ -28,7 +31,6 @@ describe 'socket.io communication', ->
 		runs =>
 			expect(@server.messageReceived[0]).toEqual 'MESSAGE'
 			expect(@server.messageReceived[1]).toEqual ['ARG1', 'ARG2']
-			expect(@server.messageReceived[2].id).toEqual @client.socket.sessionid
 			done()
 
 	it 'triggers client registration', (done) ->
@@ -41,8 +43,27 @@ describe 'socket.io communication', ->
 
 	it 'can receive a message on client from server after client registration', (done) ->
 		messageReceived = null
-		@receiveMessageOnClient = (message) -> messageReceived = message.toString()
+		@receiveMessageOnClient = (message) -> messageReceived = message
 		@client.send 'REGISTER;client-name'
+		waitsFor =>
+			messageReceived?
+		runs =>
+			expect(messageReceived).toEqual 'REGISTERED'
+			done()
+
+	it 'allows a client to reconnect from the same IP address', (done) ->
+		messageReceived = null
+		@receiveMessageOnClient = (message) -> messageReceived = message
+		@client.send 'REGISTER;client-name'
+		waitsFor =>
+			messageReceived?
+		runs =>
+			@client.disconnect()
+
+			messageReceived = null
+			@client = createClient =>
+				@client.on 'message', (message) => @receiveMessageOnClient message
+			@client.send 'REGISTER;client-name'
 		waitsFor =>
 			messageReceived?
 		runs =>
