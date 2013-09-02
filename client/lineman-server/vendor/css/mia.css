@@ -1,0 +1,37 @@
+body {
+    font-family: Arial,Verdana,sans-serif;
+}
+
+#chart {
+    width: 49%;
+    float: left;
+}
+
+ul {
+    list-style-type: none;
+}
+
+#player-list ul li {
+    padding: 0.5em 0em;
+}
+
+#player-list {
+    width: 50%;
+    float:right;
+    padding: 5px;
+    margin:0em 0em 1em;
+}
+
+#last-round ul li {
+    padding: 0.2em 0em;
+}
+
+#last-round {
+    width: 50%;
+    float:right;
+    clear:right;
+    padding: 0em;
+    min-height:20em;
+    margin:1em 0em;
+}
+

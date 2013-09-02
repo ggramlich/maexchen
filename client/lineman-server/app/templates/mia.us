@@ -1,0 +1,11 @@
+<div class="server-info">
+  Mia Server: <%= address %>:<%= port %>
+  <div id="server-state"></div>
+</div>
+
+<div id="chart">
+<canvas id="score-chart"/>
+</div>
+
+<div id="player-list"></div>
+<div id="last-round"></div>
