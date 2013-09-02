@@ -7,6 +7,15 @@ canvas = null
 windowSize = {}
 playerColors = {}
 
+#$.removeCookie 'spectatorId'
+spectatorId = $.cookie 'spectatorId'
+unless spectatorId?
+	spectatorId = guid()
+$.cookie 'spectatorId', spectatorId, { expires: 7 }
+#console.log "ID: #{spectatorId}"
+
+spectatorName = "Spectator#{spectatorId}"
+
 smoothie = new SmoothieChart
 	timestampFormatter: SmoothieChart.timeFormatter
 	millisPerPixel: 200
@@ -14,7 +23,7 @@ smoothie = new SmoothieChart
 	grid:
 		millisPerLine: 20000
 	yRangeFunction: (range) ->
-		min = range.min / 2
+		min = range.min / 2 - 0.05
 		max = range.max * 1.3
 		{min, max}
 
@@ -130,7 +139,7 @@ start = (conf) ->
 		$('#server-state').text('Connected')
 
 	register = ->
-		socket.send 'REGISTER_SPECTATOR;LinemanSpectator'
+		socket.send "REGISTER_SPECTATOR;#{spectatorName}"
 
 	canvas = document.getElementById("score-chart")
 	smoothie.streamTo canvas, delay
@@ -159,7 +168,7 @@ adaptCanvas = ->
 
 setInterval adaptCanvas, 500
 setTimeout renderLastRound, 1000
-setInterval renderLastRound, 5000
+setInterval renderLastRound, 10000
 setInterval renderScores, 1000
 
 window.mia = {
