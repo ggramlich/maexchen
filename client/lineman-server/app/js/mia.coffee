@@ -22,6 +22,7 @@ smoothie = new SmoothieChart
 	scaleSmoothing: 0.01
 	grid:
 		millisPerLine: 20000
+		verticalSections: 6
 	yRangeFunction: (range) ->
 		min = range.min / 2 - 0.05
 		max = range.max * 1.3
@@ -60,6 +61,7 @@ class ScoreSmoother
 		store[0] ? {}
 
 	getAverageScores: ->
+		return {} if store.length < @maxsize / 5
 		lastScores = @last()
 		averages = {}
 		for name, score of lastScores
@@ -87,13 +89,14 @@ class Scores
 			scoreSmoother.add playerScores
 			lastTime = currentTime
 			averageScores = scoreSmoother.getAverageScores()
-			for name, score of averageScores
+			for name, averageScore of averageScores
+				pointsPerSecond = averageScore * 1000 / delay
 				unless timeSeries[name]?
 					playerColors[name] = colors[Object.keys(timeSeries).length]
 					# console.log "#{name}: #{playerColors[name]}"
 					timeSeries[name] = new TimeSeries
 					smoothie.addTimeSeries timeSeries[name], lineWidth: '5', strokeStyle: playerColors[name]
-				timeSeries[name].append currentTime, score
+				timeSeries[name].append currentTime, pointsPerSecond
 
 currentRound = new Round
 lastRound = new Round
