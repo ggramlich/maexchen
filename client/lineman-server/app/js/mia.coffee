@@ -166,7 +166,7 @@ adaptCanvas = ->
 	windowSize =
 		height: window.innerHeight
 		width: window.innerWidth
-	canvas.width = windowSize.width * 0.5
+	canvas.width = windowSize.width * 0.48
 	canvas.height = windowSize.height * 0.8
 
 setInterval adaptCanvas, 500

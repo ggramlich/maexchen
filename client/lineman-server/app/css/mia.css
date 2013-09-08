@@ -3,7 +3,7 @@ body {
 }
 
 #chart {
-    width: 49%;
+    width: 48%;
     float: left;
 }
 
@@ -16,7 +16,7 @@ ul {
 }
 
 #player-list {
-    width: 50%;
+    width: 48%;
     float:right;
     padding: 5px;
     margin:0em 0em 1em;
@@ -27,7 +27,7 @@ ul {
 }
 
 #last-round {
-    width: 50%;
+    width: 48%;
     float:right;
     clear:right;
     padding: 0em;
