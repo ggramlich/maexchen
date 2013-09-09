@@ -81,7 +81,7 @@ class Scores
 		playerScores = {}
 		for nameScore in playerScoresStrings
 			[name, score] = nameScore.split ':'
-			playerScores[name] = score
+			playerScores[name] = parseInt score
 		@currentScores = playerScores
 
 		# Only save score if delay has gone by since the last time
