@@ -1,5 +1,5 @@
 <div class="server-info">
-  Mia Server: <%= address %>:<%= port %>
+  <p>Mia Server: <span data-bind="text: address" ></span>:<span data-bind="text: port" ></span></p>
   <div id="server-state"></div>
 </div>
 

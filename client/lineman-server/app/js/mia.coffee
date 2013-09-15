@@ -1,5 +1,6 @@
-address = document.domain
-port = 9000
+class ConnectionViewModel
+	constructor: (@address, @port) ->
+
 # delay to draw the next datapoint
 delay = 500
 smoothSamples = 50
@@ -174,8 +175,8 @@ setTimeout renderLastRound, 1000
 setInterval renderLastRound, 10000
 setInterval renderScores, 1000
 
+window.ConnectionViewModel = ConnectionViewModel
+
 window.mia = {
-	address
-	port
 	start
 }
