@@ -489,8 +489,10 @@ describe 'Mia Game', ->
 	describe 'when player wants to see', ->
 		beforeEach ->
 			registerPlayers 1, 2
+			# prevent calls to score object
 			spyOn miaGame, 'currentPlayerLoses'
 			spyOn miaGame, 'lastPlayerLoses'
+			spyOn miaGame, 'bonusPointFor'
 
 		it 'should broadcast the decision to see to all players', ->
 			spyOn player1, 'playerWantsToSee'

@@ -164,6 +164,7 @@ class MiaGame
 			return
 		@broadcastActualDice()
 		if @announcedDice.isHigherThan @actualDice
+			@bonusPointFor @currentPlayer
 			@lastPlayerLoses 'CAUGHT_BLUFFING'
 		else
 			@currentPlayerLoses 'SEE_FAILED'
@@ -171,7 +172,10 @@ class MiaGame
 	broadcastActualDice: ->
 		@players.each (player) =>
 			player.actualDice @actualDice
-		
+
+	bonusPointFor: (player) ->
+		@score.increaseFor player
+
 	currentPlayerLoses: (reason) -> @playersLose [@currentPlayer], reason
 
 	lastPlayerLoses: (reason) -> @playersLose [@lastPlayer], reason

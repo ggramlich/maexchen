@@ -160,7 +160,7 @@ describe 'the Mia server', ->
 
 			playRound otherPlayer, newPlayer
 
-			newPlayer.receivesScores theOtherPlayer: 0, thePlayer: 2
+			newPlayer.receivesScores theOtherPlayer: 0, thePlayer: 4
 
 	describe 'with two registered players', ->
 
@@ -217,7 +217,7 @@ describe 'the Mia server', ->
 
 			eachPlayer.receivesActualDice dice.create(4, 4)
 			eachPlayer.receivesNotificationThatPlayerLost 'client1', 'CAUGHT_BLUFFING'
-			eachPlayer.receivesScores client1: 0, client2: 1
+			eachPlayer.receivesScores client1: 0, client2: 2
 
 		player1LosesRound = ->
 			eachPlayer.receivesOfferToJoinRound()
