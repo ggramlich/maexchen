@@ -197,7 +197,7 @@ describe 'the Mia server', ->
 			eachPlayer.receivesNotificationThatPlayerWantsToSee 'client2'
 			eachPlayer.receivesActualDice dice.create(6, 6)
 			eachPlayer.receivesNotificationThatPlayerLost 'client2', 'SEE_FAILED'
-			eachPlayer.receivesScores client1: 1, client2: 0
+			eachPlayer.receivesScores client1: 2, client2: 0
 
 		it 'should host a round with a player calling and winning', ->
 			eachPlayer.receivesOfferToJoinRound()

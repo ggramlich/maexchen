@@ -167,6 +167,7 @@ class MiaGame
 			@bonusPointFor @currentPlayer
 			@lastPlayerLoses 'CAUGHT_BLUFFING'
 		else
+			@bonusPointFor @lastPlayer
 			@currentPlayerLoses 'SEE_FAILED'
 
 	broadcastActualDice: ->
