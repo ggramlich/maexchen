@@ -14,8 +14,8 @@ describe 'mia server', ->
 		registered: ->
 		registrationRejected: ->
 
-	beforeEach ->
-		server = miaServer.start game
+	beforeEach (done) ->
+		server = miaServer.start game, 9000, done
 		connection =
 			host: 'theHost'
 			id: 'theHost:thePort'
@@ -26,8 +26,8 @@ describe 'mia server', ->
 		spyOn game, 'registerSpectator'
 		spyOn(server, 'createPlayer').andReturn player
 
-	afterEach ->
-		server.shutDown()
+	afterEach (done) ->
+		server.shutDown(done)
 	
 	expectNameToBeRejected = (name) ->
 		server.handleMessage 'REGISTER', [name], connection

@@ -1,9 +1,10 @@
 remotePlayer = require '../lib/remotePlayer'
 miaGame = require '../lib/miaGame'
 dice = require '../lib/dice'
+MESSAGES = require '../lib/miaMessages'
 
 describe "remotePlayer", ->
-	
+
 	player = null
 	mySpy =
 		sendMessage: ->
@@ -26,7 +27,7 @@ describe "remotePlayer", ->
 
 		it 'should send ROUND STARTING', ->
 			expect(mySpy.sendMessage).toHaveBeenCalledWith 'ROUND STARTING;theToken'
-		
+
 		it 'should accept a JOIN', ->
 			player.handleMessage 'JOIN', ['theToken']
 			expect(mySpy.callback).toHaveBeenCalledWith true
@@ -49,11 +50,11 @@ describe "remotePlayer", ->
 
 		it 'should accept a ROLL', ->
 			player.handleMessage 'ROLL', ['theToken']
-			expect(mySpy.callback).toHaveBeenCalledWith miaGame.Messages.ROLL
+			expect(mySpy.callback).toHaveBeenCalledWith MESSAGES.ROLL
 
 		it 'should accept a SEE', ->
 			player.handleMessage 'SEE', ['theToken']
-			expect(mySpy.callback).toHaveBeenCalledWith miaGame.Messages.SEE
+			expect(mySpy.callback).toHaveBeenCalledWith MESSAGES.SEE
 
 		it 'should ignore invalid messages', ->
 			player.handleMessage 'JOIN', ['theToken']
@@ -64,7 +65,7 @@ describe "remotePlayer", ->
 			expect(mySpy.callback).toHaveBeenCalled()
 
 	describe 'after rolling dice', ->
-		
+
 		beforeEach ->
 			player.yourRoll 'theDice', mySpy.callback
 

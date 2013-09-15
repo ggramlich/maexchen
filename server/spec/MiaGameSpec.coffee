@@ -14,13 +14,14 @@ class PlayerStub
 
 mia = require '../lib/miaGame'
 dice = require '../lib/dice'
+MESSAGES = require '../lib/miaMessages'
 
 describe 'Mia Game', ->
 	miaGame = player1 = player2 = player3 = player4 = registerPlayers = null
 	accept = (question) -> question(true)
 	deny = (question) -> question(false)
-	roll = (question) -> question(mia.Messages.ROLL)
-	see = (question) -> question(mia.Messages.SEE)
+	roll = (question) -> question(MESSAGES.ROLL)
+	see = (question) -> question(MESSAGES.SEE)
 	garbage = (question) -> question('GARBAGE')
 
 	beforeEach ->
@@ -30,8 +31,8 @@ describe 'Mia Game', ->
 		player2 = players[1]
 		player3 = players[2]
 		player4 = players[3]
-		this.addMatchers
-			toHavePlayer: (player) -> this.actual.hasPlayer player
+		@addMatchers
+			toHavePlayer: (player) -> @actual.hasPlayer player
 
 		registerPlayers = (numbers...) ->
 			for number in numbers
@@ -63,7 +64,7 @@ describe 'Mia Game', ->
 	it 'overwrites previous players with the same name on register', ->
 		oldPlayer = name: 'theName'
 		newPlayer = name: 'theName'
-		
+
 		miaGame.registerPlayer oldPlayer
 		miaGame.registerPlayer newPlayer
 
@@ -178,7 +179,7 @@ describe 'Mia Game', ->
 			runs ->
 				expect(miaGame.startRound).not.toHaveBeenCalled()
 			waitsFor (-> miaGame.startRound.wasCalled), 30
-			
+
 		it 'should cancel the round when nobody joins', ->
 			spyOn miaGame, 'cancelRound'
 			spyOn miaGame, 'startRound'
@@ -204,7 +205,7 @@ describe 'Mia Game', ->
 		it 'should set the round number to 1 for the first round', ->
 			miaGame.newRound()
 			expect(miaGame.roundNumber).toBe 1
-		
+
 		it 'should increment the round number', ->
 			miaGame.roundNumber = 41
 			miaGame.newRound()
@@ -250,7 +251,7 @@ describe 'Mia Game', ->
 			spyOn miaGame.score, 'increaseFor'
 			miaGame.currentRound.add player1
 			miaGame.startRound()
-			
+
 			expect(miaGame.score.increaseFor).toHaveBeenCalledWith player1
 			expect(miaGame.score.increaseFor).not.toHaveBeenCalledWith player2
 
@@ -385,7 +386,7 @@ describe 'Mia Game', ->
 			miaGame.rollDice()
 			expect(player1.playerRolls).toHaveBeenCalledWith player1
 			expect(player2.playerRolls).toHaveBeenCalledWith player1
-			
+
 		it 'should call announce with the announced dice', ->
 			spyOn miaGame, 'announce'
 			player1.yourRoll = (dice, announce) -> announce 'announcedDice'
@@ -547,7 +548,7 @@ describe 'Mia Game', ->
 		beforeEach ->
 			registerPlayers 1, 2
 			miaGame.currentRound.add player2
-			
+
 		it 'should tell all players about the announced dice', ->
 			spyOn player1, 'announcedDiceBy'
 			spyOn player2, 'announcedDiceBy'
@@ -654,15 +655,15 @@ describe 'permutation', ->
 	list1 = list2 = {}
 
 	beforeEach ->
-		this.addMatchers
+		@addMatchers
 
 			toHaveEqualLength: (other) ->
-				this.actual.length == other.length
+				@actual.length == other.length
 
 			toEqualArray: (other) ->
-				return false unless this.actual.length == other.length
+				return false unless @actual.length == other.length
 				for key, value of other
-					return false unless this.actual[key] == value
+					return false unless @actual[key] == value
 				true
 
 		list1 = new mia.classes.PlayerList

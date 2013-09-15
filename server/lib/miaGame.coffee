@@ -1,11 +1,8 @@
-expireCallback = require '../lib/expireCallback'
+expireCallback = require './expireCallback'
+MESSAGES = require './miaMessages'
 
 # See http://coffeescriptcookbook.com/chapters/arrays/shuffling-array-elements
 Array::shuffle = -> @sort -> 0.5 - Math.random()
-
-Messages =
-	ROLL: {}
-	SEE: {}
 
 class PlayerList
 	constructor: -> @players = []
@@ -116,8 +113,8 @@ class MiaGame
 
 		question = expirer.makeExpiring (turn) =>
 			switch turn
-				when Messages.ROLL then @rollDice()
-				when Messages.SEE then @showDice()
+				when MESSAGES.ROLL then @rollDice()
+				when MESSAGES.SEE then @showDice()
 				else @currentPlayerLoses 'INVALID_TURN'
 
 		@currentPlayer.yourTurn question
@@ -205,7 +202,6 @@ class MiaGame
 
 exports.createGame = -> new MiaGame
 
-exports.Messages = Messages
 exports.classes =
 	MiaGame: MiaGame
 	PlayerList: PlayerList

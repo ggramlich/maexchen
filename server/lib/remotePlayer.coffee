@@ -1,6 +1,6 @@
 uuid = require 'node-uuid'
 
-miaGame = require './miaGame'
+MESSAGES = require './miaMessages'
 dice = require './dice'
 
 class InactiveState
@@ -19,14 +19,9 @@ class WaitingForTurnState
 	constructor: (@token, @callback, @nextState) ->
 	handleMessage: (command, args) ->
 		token = args[0]
-		if (token == @token)
-			switch command
-				when 'ROLL'
-					@nextState new InactiveState
-					@callback miaGame.Messages.ROLL
-				when 'SEE'
-					@nextState new InactiveState
-					@callback miaGame.Messages.SEE
+		if (command == 'ROLL' or command == 'SEE') and token == @token
+			@nextState new InactiveState
+			@callback MESSAGES[command]
 
 class WaitingForAnnounceState
 	constructor: (@token, @callback, @nextState) ->

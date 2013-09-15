@@ -1,0 +1,6 @@
+travis.ci integration
+
+additional protocol: socket.io
+
+html page for web client
+web client spectator visualization of results
