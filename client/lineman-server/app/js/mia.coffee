@@ -96,6 +96,7 @@ class Scores
 	lastTime = 0;
 	timeSeries = {}
 	currentScores: {}
+	pointsPerSeconds: {}
 
 	# scoreInfo is a string like 'name1:score1,name2:score2'
 	track: (scoreInfo) =>
@@ -113,13 +114,14 @@ class Scores
 			lastTime = currentTime
 			averageScores = scoreSmoother.getAverageScores()
 			for name, averageScore of averageScores
-				pointsPerSecond = averageScore * 1000 / delay
+				pointsPerSeconds = averageScore * 1000 / delay
+				@pointsPerSeconds[name] = pointsPerSeconds
 				unless timeSeries[name]?
 					playerColors[name] = colors[Object.keys(timeSeries).length]
 					# console.log "#{name}: #{playerColors[name]}"
 					timeSeries[name] = new TimeSeries
 					smoothie.addTimeSeries timeSeries[name], lineWidth: '5', strokeStyle: playerColors[name]
-				timeSeries[name].append currentTime, pointsPerSecond
+				timeSeries[name].append currentTime, pointsPerSeconds
 
 currentRound = new Round
 lastRound = new Round
@@ -152,14 +154,15 @@ handleMessage = (message) ->
 renderScores = ->
 	sortScores = []
 	for name, score of scores.currentScores
-		sortScores.push {name, score}
+		pointsPerSeconds = scores.pointsPerSeconds[name]
+		sortScores.push {name, score, pointsPerSeconds}
 
 	sortScores.sort (a, b) -> a.score < b.score
 
 	$list = $('<ul>')
 	for entry in sortScores
 		color = playerColors[entry.name]
-		$list.append "<li><span style=\"color:#000; background-color: #{color}; width:1em; display:inline-block\">&nbsp;</span> #{entry.name}: #{entry.score}</li>"
+		$list.append "<li><span style=\"color:#000; background-color: #{color}; width:1em; display:inline-block\">&nbsp;</span> #{(entry.pointsPerSeconds?.toFixed 2) ? "--"} pps #{entry.name}: #{entry.score}</li>"
 		$('#player-list').empty()
 		$('#player-list').append($list)
 
