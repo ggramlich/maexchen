@@ -1,5 +1,27 @@
 class ConnectionViewModel
-	constructor: (@address, @port) ->
+	constructor: (address, port) ->
+		@address = ko.observable address
+		@port = ko.observable port
+	server_state: ko.observable 'Not connected'
+	connect: =>
+		connect @
+
+connect = (connectionViewModel) ->
+	connectionViewModel.server_state 'Connecting'
+	url = "http://#{connectionViewModel.address()}:#{connectionViewModel.port()}"
+	socket = io.connect url
+	socket.on 'connect', -> connected(register)
+	socket.on 'disconnect', disconnected
+	socket.on 'message', handleMessage
+
+	connected = (callback) ->
+		connectionViewModel.server_state 'Connected'
+		callback()
+	disconnected = ->
+		connectionViewModel.server_state 'disconnected'
+
+	register = ->
+		socket.send "REGISTER_SPECTATOR;#{spectatorName}"
 
 # delay to draw the next datapoint
 delay = 500
@@ -127,27 +149,6 @@ handleMessage = (message) ->
 	else
 		currentRound.addMessage message
 
-start = (conf) ->
-	url = "http://#{conf.address}:#{conf.port}"
-	socket = io.connect url
-	socket.on 'connect', -> connected(register)
-	socket.on 'disconnect', disconnected
-	socket.on 'message', handleMessage
-
-	connected = (callback) ->
-		showState 'Connected'
-		callback()
-	disconnected = ->
-		showState ''
-	showState = ->
-		$('#server-state').text('Connected')
-
-	register = ->
-		socket.send "REGISTER_SPECTATOR;#{spectatorName}"
-
-	canvas = document.getElementById("score-chart")
-	smoothie.streamTo canvas, delay
-
 renderScores = ->
 	sortScores = []
 	for name, score of scores.currentScores
@@ -170,10 +171,14 @@ adaptCanvas = ->
 	canvas.width = windowSize.width * 0.48
 	canvas.height = windowSize.height * 0.8
 
-setInterval adaptCanvas, 500
-setTimeout renderLastRound, 1000
-setInterval renderLastRound, 10000
-setInterval renderScores, 1000
+start = ->
+	canvas = document.getElementById("score-chart")
+	smoothie.streamTo canvas, delay
+
+	setInterval adaptCanvas, 500
+	setTimeout renderLastRound, 1000
+	setInterval renderLastRound, 10000
+	setInterval renderScores, 1000
 
 window.ConnectionViewModel = ConnectionViewModel
 

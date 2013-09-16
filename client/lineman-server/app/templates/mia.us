@@ -1,6 +1,6 @@
 <div class="server-info">
-  <p>Mia Server: <span data-bind="text: address" ></span>:<span data-bind="text: port" ></span></p>
-  <div id="server-state"></div>
+  <p>Mia Server: <input data-bind="value: address" />:<input data-bind="value: port" /><button data-bind="click: connect">Connect</button></p>
+  <div data-bind="text: server_state"></div>
 </div>
 
 <div id="chart">
