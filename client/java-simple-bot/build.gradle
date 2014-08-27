@@ -2,7 +2,15 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 
+apply plugin: 'application'
+
 group = 'de.andrena'
+
+mainClassName = 'simplebot.Main'
+
+run {
+	args 'localhost', '9000', 'java-simple'
+}
 
 repositories {
 	mavenLocal()
