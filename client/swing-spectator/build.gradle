@@ -1,8 +1,11 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
+apply plugin: 'application'
 
 group = 'de.andrena'
+
+mainClassName = 'spectator.Main'
 
 repositories {
 	mavenLocal()
@@ -18,7 +21,7 @@ dependencies {
 
 jar {
 	manifest {
-		attributes 'Main-Class': 'spectator.Main'
+		attributes 'Main-Class': mainClassName
 	}
   from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
@@ -32,4 +35,8 @@ task sourcesJar(type: Jar, dependsOn:classes) {
 task javadocJar(type: Jar, dependsOn:javadoc) {
 	classifier = 'javadoc'
 	from javadoc.destinationDir
+}
+
+run {
+	args "localhost", "9000"
 }
